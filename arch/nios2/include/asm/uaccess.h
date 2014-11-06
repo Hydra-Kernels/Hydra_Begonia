@@ -12,12 +12,32 @@
 
 #ifndef _ASM_NIOS2_UACCESS_H
 #define _ASM_NIOS2_UACCESS_H
-
+#include <linux/errno.h>
+#include <linux/thread_info.h>
 #include <linux/string.h>
 
 #include <asm/page.h>
+#define VERIFY_READ	0
+#define VERIFY_WRITE	1
 
-#include <asm/extable.h>
+/*
+ * The exception table consists of pairs of addresses: the first is the
+ * address of an instruction that is allowed to fault, and the second is
+ * the address at which the program should continue.  No registers are
+ * modified, so it is entirely up to the continuation code to figure out
+ * what to do.
+ *
+ * All the routines below use bits of fixup code that are out of line
+ * with the main instruction path.  This means when everything is well,
+ * we don't even have to jump over them.  Further, they do not intrude
+ * on our cache or tlb entries.
+ */
+struct exception_table_entry {
+	unsigned long insn;
+	unsigned long fixup;
+};
+
+extern int fixup_exception(struct pt_regs *regs);
 
 /*
  * Segment stuff
@@ -42,7 +62,6 @@
 
 # define __EX_TABLE_SECTION	".section __ex_table,\"a\"\n"
 
-#define user_addr_max() (uaccess_kernel() ? ~0UL : TASK_SIZE)
 
 /*
  * Zero Userspace
@@ -75,17 +94,32 @@ static inline unsigned long __must_check clear_user(void __user *to,
 	return __clear_user(to, n);
 }
 
-extern unsigned long
-raw_copy_from_user(void *to, const void __user *from, unsigned long n);
-extern unsigned long
-raw_copy_to_user(void __user *to, const void *from, unsigned long n);
-#define INLINE_COPY_FROM_USER
-#define INLINE_COPY_TO_USER
+extern long __copy_from_user(void *to, const void __user *from,
+				unsigned long n);
+extern long __copy_to_user(void __user *to, const void *from, unsigned long n);
+
+static inline long copy_from_user(void *to, const void __user *from,
+				unsigned long n)
+{
+	if (!access_ok(VERIFY_READ, from, n))
+		return n;
+	return __copy_from_user(to, from, n);
+}
+
+static inline long copy_to_user(void __user *to, const void *from,
+				unsigned long n)
+{
+	if (!access_ok(VERIFY_WRITE, to, n))
+		return n;
+	return __copy_to_user(to, from, n);
+}
 
 extern long strncpy_from_user(char *__to, const char __user *__from,
-			      long __len);
-extern __must_check long strlen_user(const char __user *str);
-extern __must_check long strnlen_user(const char __user *s, long n);
+				long __len);
+extern long strnlen_user(const char __user *s, long n);
+
+#define __copy_from_user_inatomic	__copy_from_user
+#define __copy_to_user_inatomic		__copy_to_user
 
 /* Optimized macros */
 #define __get_user_asm(val, insn, addr, err)				\
@@ -104,7 +138,7 @@ extern __must_check long strnlen_user(const char __user *s, long n);
 
 #define __get_user_unknown(val, size, ptr, err) do {			\
 	err = 0;							\
-	if (__copy_from_user(&(val), ptr, size)) {			\
+	if (copy_from_user(&(val), ptr, size)) {			\
 		err = -EFAULT;						\
 	}								\
 	} while (0)
@@ -131,9 +165,9 @@ do {									\
 	({								\
 	long __gu_err = -EFAULT;					\
 	const __typeof__(*(ptr)) __user *__gu_ptr = (ptr);		\
-	unsigned long __gu_val = 0;					\
+	unsigned long __gu_val;						\
 	__get_user_common(__gu_val, sizeof(*(ptr)), __gu_ptr, __gu_err);\
-	(x) = (__force __typeof__(x))__gu_val;				\
+	(x) = (__typeof__(x))__gu_val;					\
 	__gu_err;							\
 	})
 
@@ -145,7 +179,7 @@ do {									\
 	if (access_ok(VERIFY_READ,  __gu_ptr, sizeof(*__gu_ptr)))	\
 		__get_user_common(__gu_val, sizeof(*__gu_ptr),		\
 			__gu_ptr, __gu_err);				\
-	(x) = (__force __typeof__(x))__gu_val;				\
+	(x) = (__typeof__(x))__gu_val;					\
 	__gu_err;							\
 })
 
