@@ -63,12 +63,17 @@ bool kthread_is_per_cpu(struct task_struct *k);
 		= kthread_create(threadfn, data, namefmt, ## __VA_ARGS__); \
 	if (!IS_ERR(__k)) {						   \
 		__k->flags |= PF_PERF_CRITICAL;				   \
+<<<<<<< HEAD
 
 		BUILD_BUG_ON(perfmask != cpu_lp_mask &&			   \
 
 		BUILD_BUG_ON(perfmask != cpu_lp_mask &&		  	   \
 
 			     perfmask != cpu_perf_mask);		   \
+=======
+		BUILD_BUG_ON(perfmask != cpu_perf_mask &&		   \
+			     perfmask != cpu_prime_mask);		   \
+>>>>>>> 402bfebc3a78 (kernel: Add tri-cluster API to affine IRQs and kthreads to fast CPUs)
 		kthread_bind_mask(__k, perfmask);			   \
 		wake_up_process(__k);					   \
 	}								   \

@@ -1079,9 +1079,16 @@ static int do_cpu_down(unsigned int cpu, enum cpuhp_state target)
 	cpumask_andnot(&newmask, cpu_online_mask, cpumask_of(cpu));
 	preempt_enable();
 
+<<<<<<< HEAD
 	/* One big and LITTLE  CPU must remain online */
 	if (!cpumask_intersects(&newmask, cpu_lp_mask) ||
 	    !cpumask_intersects(&newmask, cpu_perf_mask))
+=======
+	/* One big, LITTLE, and prime CPU must remain online */
+	if (!cpumask_intersects(&newmask, cpu_lp_mask) ||
+	    !cpumask_intersects(&newmask, cpu_perf_mask) ||
+	    !cpumask_intersects(&newmask, cpu_prime_mask))
+>>>>>>> 402bfebc3a78 (kernel: Add tri-cluster API to affine IRQs and kthreads to fast CPUs)
 		return -EINVAL;
 
 	cpu_maps_update_begin();
