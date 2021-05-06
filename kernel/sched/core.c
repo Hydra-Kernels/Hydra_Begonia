@@ -2531,7 +2531,10 @@ out:
 
 /*
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> fd7480ded23e (sched: Add API to migrate the current process to a given cpumask)
  * Calls to sched_migrate_to_cpumask_start() cannot nest. This can only be used
  * in process context.
  */
@@ -2566,7 +2569,10 @@ void sched_migrate_to_cpumask_end(const struct cpumask *old_mask,
 		struct rq *rq = this_rq();
 
 		raw_spin_lock(&rq->lock);
+
 		update_rq_clock(rq);
+
+
 		do_set_cpus_allowed(p, old_mask);
 		raw_spin_unlock(&rq->lock);
 	}
@@ -2574,7 +2580,10 @@ void sched_migrate_to_cpumask_end(const struct cpumask *old_mask,
 }
 
 /*
+<<<<<<< HEAD
 >>>>>>> d0dcc01a6b50 (sched/core: Fix rq clock warning in sched_migrate_to_cpumask_end())
+=======
+>>>>>>> fd7480ded23e (sched: Add API to migrate the current process to a given cpumask)
  * wait_task_inactive - wait for a thread to unschedule.
  *
  * If @match_state is nonzero, it's the @p->state value just checked and
