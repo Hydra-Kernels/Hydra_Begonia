@@ -67,6 +67,7 @@ struct screen_monitor {
 };
 struct screen_monitor sm;
 #endif
+<<<<<<< HEAD
 static atomic_t switch_mode = ATOMIC_INIT(10);
 static atomic_t temp_state = ATOMIC_INIT(0);
 static atomic_t lighter_event = ATOMIC_INIT(0);
@@ -74,6 +75,11 @@ static atomic_t balance_mode = ATOMIC_INIT(0);
 static atomic_t board_sensor_temp_comp_default = ATOMIC_INIT(0);
 static atomic_t cpu_nolimit_temp_default = ATOMIC_INIT(0);
 static atomic_t wifi_limit = ATOMIC_INIT(0);
+=======
+static atomic_t switch_mode = ATOMIC_INIT(-1);
+static atomic_t temp_state = ATOMIC_INIT(0);
+static atomic_t lighter_event = ATOMIC_INIT(0);
+>>>>>>> f2e49bb96363 (thermal: Implement thermal config switch)
 static char boost_buf[128];
 static struct device thermal_message_dev;
 const char *board_sensor;
@@ -1194,6 +1200,7 @@ static ssize_t
 thermal_sconfig_store(struct device *dev,
 				struct device_attribute *attr, const char *buf, size_t len)
 {
+<<<<<<< HEAD
        int ret, val = -1;
 
        ret = kstrtoint(buf, 10, &val);
@@ -1202,6 +1209,14 @@ thermal_sconfig_store(struct device *dev,
 
        if (ret)
                 return ret;
+=======
+       int val = -1;
+
+       val = simple_strtol(buf, NULL, 10);
+
+       atomic_set(&switch_mode, val);
+
+>>>>>>> f2e49bb96363 (thermal: Implement thermal config switch)
        return len;
 }
 
@@ -1225,6 +1240,7 @@ thermal_boost_store(struct device *dev,
 
 static DEVICE_ATTR(boost, 0644,
 		thermal_boost_show, thermal_boost_store);
+<<<<<<< HEAD
 
 static ssize_t
 thermal_balance_mode_show(struct device *dev,
@@ -1249,6 +1265,8 @@ thermal_balance_mode_store(struct device *dev,
 static DEVICE_ATTR(balance_mode, 0664,
 		thermal_balance_mode_show, thermal_balance_mode_store);
 
+=======
+>>>>>>> f2e49bb96363 (thermal: Implement thermal config switch)
 static ssize_t
 thermal_temp_state_show(struct device *dev,
 				struct device_attribute *attr, char *buf)
@@ -1260,6 +1278,7 @@ static ssize_t
 thermal_temp_state_store(struct device *dev,
 				struct device_attribute *attr, const char *buf, size_t len)
 {
+<<<<<<< HEAD
        int ret, val = -1;
 
        ret = kstrtoint(buf, 10, &val);
@@ -1268,6 +1287,14 @@ thermal_temp_state_store(struct device *dev,
 
        if (ret)
                 return ret;
+=======
+       int val = -1;
+
+       val = simple_strtol(buf, NULL, 10);
+
+       atomic_set(&temp_state, val);
+
+>>>>>>> f2e49bb96363 (thermal: Implement thermal config switch)
        return len;
 }
 
@@ -1369,6 +1396,7 @@ thermal_board_sensor_temp_store(struct device *dev,
 static DEVICE_ATTR(board_sensor_temp, 0664,
 		thermal_board_sensor_temp_show, thermal_board_sensor_temp_store);
 
+<<<<<<< HEAD
 static ssize_t
 thermal_board_sensor_temp_comp_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -1436,6 +1464,8 @@ thermal_cpu_nolimit_temp_store(struct device *dev,
 static DEVICE_ATTR(cpu_nolimit_temp, 0664,
 		   thermal_cpu_nolimit_temp_show, thermal_cpu_nolimit_temp_store);
 
+=======
+>>>>>>> f2e49bb96363 (thermal: Implement thermal config switch)
 static int create_thermal_message_node(void)
 {
        int ret = 0;
@@ -1475,6 +1505,7 @@ static int create_thermal_message_node(void)
 		ret = sysfs_create_file(&thermal_message_dev.kobj, &dev_attr_board_sensor_temp.attr);
 		if (ret < 0)
 		       pr_warn("Thermal: create board sensor temp node failed\n");
+<<<<<<< HEAD
 
 		ret = sysfs_create_file(&thermal_message_dev.kobj, &dev_attr_board_sensor_temp_comp.attr);
 		if (ret < 0)
@@ -1491,6 +1522,8 @@ static int create_thermal_message_node(void)
 		ret = sysfs_create_file(&thermal_message_dev.kobj, &dev_attr_cpu_nolimit_temp.attr);
 		if (ret < 0)
 			pr_warn("Thermal: create cpu nolimit node failed\n");
+=======
+>>>>>>> f2e49bb96363 (thermal: Implement thermal config switch)
        }
 
        return ret;
