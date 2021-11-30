@@ -58,9 +58,15 @@ static void exfat_get_uniname_from_ext_entry(struct super_block *sb,
 }
 
 /* read a directory entry from the opened directory */
+<<<<<<< HEAD
 static int exfat_readdir(struct inode *inode, loff_t *cpos, struct exfat_dir_entry *dir_entry)
 {
 	int i, dentries_per_clu, dentries_per_clu_bits = 0, num_ext;
+=======
+static int exfat_readdir(struct inode *inode, struct exfat_dir_entry *dir_entry)
+{
+	int i, dentries_per_clu, dentries_per_clu_bits = 0;
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	unsigned int type, clu_offset;
 	sector_t sector;
 	struct exfat_chain dir, clu;
@@ -69,7 +75,11 @@ static int exfat_readdir(struct inode *inode, loff_t *cpos, struct exfat_dir_ent
 	struct super_block *sb = inode->i_sb;
 	struct exfat_sb_info *sbi = EXFAT_SB(sb);
 	struct exfat_inode_info *ei = EXFAT_I(inode);
+<<<<<<< HEAD
 	unsigned int dentry = EXFAT_B_TO_DEN(*cpos) & 0xFFFFFFFF;
+=======
+	unsigned int dentry = ei->rwoffset & 0xFFFFFFFF;
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	struct buffer_head *bh;
 
 	/* check if the given file ID is opened */
@@ -126,7 +136,10 @@ static int exfat_readdir(struct inode *inode, loff_t *cpos, struct exfat_dir_ent
 				continue;
 			}
 
+<<<<<<< HEAD
 			num_ext = ep->dentry.file.num_ext;
+=======
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 			dir_entry->attr = le16_to_cpu(ep->dentry.file.attr);
 			exfat_get_entry_time(sbi, &dir_entry->crtime,
 					ep->dentry.file.create_tz,
@@ -157,13 +170,20 @@ static int exfat_readdir(struct inode *inode, loff_t *cpos, struct exfat_dir_ent
 				return -EIO;
 			dir_entry->size =
 				le64_to_cpu(ep->dentry.stream.valid_size);
+<<<<<<< HEAD
 			dir_entry->entry = dentry;
+=======
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 			brelse(bh);
 
 			ei->hint_bmap.off = dentry >> dentries_per_clu_bits;
 			ei->hint_bmap.clu = clu.dir;
 
+<<<<<<< HEAD
 			*cpos = EXFAT_DEN_TO_B(dentry + 1 + num_ext);
+=======
+			ei->rwoffset = ++dentry;
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 			return 0;
 		}
 
@@ -179,7 +199,11 @@ static int exfat_readdir(struct inode *inode, loff_t *cpos, struct exfat_dir_ent
 	}
 
 	dir_entry->namebuf.lfn[0] = '\0';
+<<<<<<< HEAD
 	*cpos = EXFAT_DEN_TO_B(dentry);
+=======
+	ei->rwoffset = dentry;
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	return 0;
 }
 
@@ -243,10 +267,19 @@ static int exfat_iterate(struct file *filp, struct dir_context *ctx)
 	if (err)
 		goto unlock;
 get_new:
+<<<<<<< HEAD
 	if (cpos >= i_size_read(inode))
 		goto end_of_dir;
 
 	err = exfat_readdir(inode, &cpos, &de);
+=======
+	ei->rwoffset = EXFAT_B_TO_DEN(cpos);
+
+	if (cpos >= i_size_read(inode))
+		goto end_of_dir;
+
+	err = exfat_readdir(inode, &de);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	if (err) {
 		/*
 		 * At least we tried to read a sector.  Move cpos to next sector
@@ -261,10 +294,20 @@ get_new:
 		goto end_of_dir;
 	}
 
+<<<<<<< HEAD
 	if (!nb->lfn[0])
 		goto end_of_dir;
 
 	i_pos = ((loff_t)ei->start_clu << 32) |	(de.entry & 0xffffffff);
+=======
+	cpos = EXFAT_DEN_TO_B(ei->rwoffset);
+
+	if (!nb->lfn[0])
+		goto end_of_dir;
+
+	i_pos = ((loff_t)ei->start_clu << 32) |
+		((ei->rwoffset - 1) & 0xffffffff);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	tmp = exfat_iget(sb, i_pos);
 	if (tmp) {
 		inum = tmp->i_ino;
@@ -466,7 +509,11 @@ int exfat_init_dir_entry(struct inode *inode, struct exfat_chain *p_dir,
 			&ep->dentry.file.access_date,
 			NULL);
 
+<<<<<<< HEAD
 	exfat_update_bh(bh, IS_DIRSYNC(inode));
+=======
+	exfat_update_bh(sb, bh, IS_DIRSYNC(inode));
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	brelse(bh);
 
 	ep = exfat_get_dentry(sb, p_dir, entry + 1, &bh, &sector);
@@ -476,7 +523,11 @@ int exfat_init_dir_entry(struct inode *inode, struct exfat_chain *p_dir,
 	exfat_init_stream_entry(ep,
 		(type == TYPE_FILE) ? ALLOC_FAT_CHAIN : ALLOC_NO_FAT_CHAIN,
 		start_clu, size);
+<<<<<<< HEAD
 	exfat_update_bh(bh, IS_DIRSYNC(inode));
+=======
+	exfat_update_bh(sb, bh, IS_DIRSYNC(inode));
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	brelse(bh);
 
 	return 0;
@@ -512,7 +563,11 @@ int exfat_update_dir_chksum(struct inode *inode, struct exfat_chain *p_dir,
 	}
 
 	fep->dentry.file.checksum = cpu_to_le16(chksum);
+<<<<<<< HEAD
 	exfat_update_bh(fbh, IS_DIRSYNC(inode));
+=======
+	exfat_update_bh(sb, fbh, IS_DIRSYNC(inode));
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 release_fbh:
 	brelse(fbh);
 	return ret;
@@ -534,7 +589,11 @@ int exfat_init_ext_entry(struct inode *inode, struct exfat_chain *p_dir,
 		return -EIO;
 
 	ep->dentry.file.num_ext = (unsigned char)(num_entries - 1);
+<<<<<<< HEAD
 	exfat_update_bh(bh, sync);
+=======
+	exfat_update_bh(sb, bh, sync);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	brelse(bh);
 
 	ep = exfat_get_dentry(sb, p_dir, entry + 1, &bh, &sector);
@@ -543,7 +602,11 @@ int exfat_init_ext_entry(struct inode *inode, struct exfat_chain *p_dir,
 
 	ep->dentry.stream.name_len = p_uniname->name_len;
 	ep->dentry.stream.name_hash = cpu_to_le16(p_uniname->name_hash);
+<<<<<<< HEAD
 	exfat_update_bh(bh, sync);
+=======
+	exfat_update_bh(sb, bh, sync);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	brelse(bh);
 
 	for (i = EXFAT_FIRST_CLUSTER; i < num_entries; i++) {
@@ -552,7 +615,11 @@ int exfat_init_ext_entry(struct inode *inode, struct exfat_chain *p_dir,
 			return -EIO;
 
 		exfat_init_name_entry(ep, uniname);
+<<<<<<< HEAD
 		exfat_update_bh(bh, sync);
+=======
+		exfat_update_bh(sb, bh, sync);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 		brelse(bh);
 		uniname += EXFAT_FILE_NAME_LEN;
 	}
@@ -576,7 +643,11 @@ int exfat_remove_entries(struct inode *inode, struct exfat_chain *p_dir,
 			return -EIO;
 
 		exfat_set_entry_type(ep, TYPE_DELETED);
+<<<<<<< HEAD
 		exfat_update_bh(bh, IS_DIRSYNC(inode));
+=======
+		exfat_update_bh(sb, bh, IS_DIRSYNC(inode));
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 		brelse(bh);
 	}
 
@@ -600,6 +671,7 @@ void exfat_update_dir_chksum_with_entry_set(struct exfat_entry_set_cache *es)
 	es->modified = true;
 }
 
+<<<<<<< HEAD
 int exfat_free_dentry_set(struct exfat_entry_set_cache *es, int sync)
 {
 	int i, err = 0;
@@ -614,6 +686,18 @@ int exfat_free_dentry_set(struct exfat_entry_set_cache *es, int sync)
 			brelse(es->bh[i]);
 	kfree(es);
 	return err;
+=======
+void exfat_free_dentry_set(struct exfat_entry_set_cache *es, int sync)
+{
+	int i;
+
+	for (i = 0; i < es->num_bh; i++) {
+		if (es->modified)
+			exfat_update_bh(es->sb, es->bh[i], sync);
+		brelse(es->bh[i]);
+	}
+	kfree(es);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 }
 
 static int exfat_walk_fat_chain(struct super_block *sb,
@@ -907,6 +991,10 @@ enum {
 /*
  * return values:
  *   >= 0	: return dir entiry position with the name in dir
+<<<<<<< HEAD
+=======
+ *   -EEXIST	: (root dir, ".") it is the root dir itself
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
  *   -ENOENT	: entry with the name does not exist
  *   -EIO	: I/O error
  */
@@ -974,8 +1062,16 @@ rewind:
 					if (ei->hint_femp.eidx ==
 							EXFAT_HINT_NONE ||
 						candi_empty.eidx <=
+<<<<<<< HEAD
 							 ei->hint_femp.eidx)
 						ei->hint_femp = candi_empty;
+=======
+							 ei->hint_femp.eidx) {
+						memcpy(&ei->hint_femp,
+							&candi_empty,
+							sizeof(candi_empty));
+					}
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 				}
 
 				brelse(bh);
@@ -1108,7 +1204,11 @@ found:
 			ret = exfat_get_next_cluster(sb, &clu.dir);
 		}
 
+<<<<<<< HEAD
 		if (ret || clu.dir == EXFAT_EOF_CLUSTER) {
+=======
+		if (ret || clu.dir != EXFAT_EOF_CLUSTER) {
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 			/* just initialized hint_stat */
 			hint_stat->clu = p_dir->dir;
 			hint_stat->eidx = 0;

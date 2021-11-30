@@ -18,6 +18,11 @@
 #define EXFAT_SUPER_MAGIC       0x2011BAB0UL
 #define EXFAT_ROOT_INO		1
 
+<<<<<<< HEAD
+=======
+#define EXFAT_SB_DIRTY		0
+
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 #define EXFAT_CLUSTERS_UNTRACKED (~0u)
 
 /*
@@ -133,7 +138,11 @@ enum {
 
 struct exfat_dentry_namebuf {
 	char *lfn;
+<<<<<<< HEAD
 	int lfnbuf_len; /* usually MAX_UNINAME_BUF_SIZE */
+=======
+	int lfnbuf_len; /* usally MAX_UNINAME_BUF_SIZE */
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 };
 
 /* unicode name structure */
@@ -231,8 +240,12 @@ struct exfat_sb_info {
 	unsigned int num_FAT_sectors; /* num of FAT sectors */
 	unsigned int root_dir; /* root dir cluster */
 	unsigned int dentries_per_clu; /* num of dentries per cluster */
+<<<<<<< HEAD
 	unsigned int vol_flags; /* volume flags */
 	unsigned int vol_flags_persistent; /* volume flags to retain */
+=======
+	unsigned int vol_flag; /* volume dirty flag */
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	struct buffer_head *boot_bh; /* buffer_head of BOOT sector */
 
 	unsigned int map_clu; /* allocation bitmap start cluster */
@@ -244,6 +257,10 @@ struct exfat_sb_info {
 	unsigned int clu_srch_ptr; /* cluster search pointer */
 	unsigned int used_clusters; /* number of used clusters */
 
+<<<<<<< HEAD
+=======
+	unsigned long s_state;
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 	struct mutex s_lock; /* superblock lock */
 	struct exfat_mount_options options;
 	struct nls_table *nls_io; /* Charset used for input and display */
@@ -255,8 +272,11 @@ struct exfat_sb_info {
 	struct rcu_head rcu;
 };
 
+<<<<<<< HEAD
 #define EXFAT_CACHE_VALID	0
 
+=======
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 /*
  * EXFAT file system inode in-memory data
  */
@@ -272,6 +292,11 @@ struct exfat_inode_info {
 	 * the validation of hint_stat.
 	 */
 	unsigned int version;
+<<<<<<< HEAD
+=======
+	/* file offset or dentry index for readdir */
+	loff_t rwoffset;
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 
 	/* hint for cluster last accessed */
 	struct exfat_hint hint_bmap;
@@ -376,7 +401,11 @@ static inline bool exfat_is_last_sector_in_cluster(struct exfat_sb_info *sbi,
 static inline sector_t exfat_cluster_to_sector(struct exfat_sb_info *sbi,
 		unsigned int clus)
 {
+<<<<<<< HEAD
 	return ((sector_t)(clus - EXFAT_RESERVED_CLUSTERS) << sbi->sect_per_clus_bits) +
+=======
+	return ((clus - EXFAT_RESERVED_CLUSTERS) << sbi->sect_per_clus_bits) +
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 		sbi->data_start_sector;
 }
 
@@ -388,8 +417,12 @@ static inline int exfat_sector_to_cluster(struct exfat_sb_info *sbi,
 }
 
 /* super.c */
+<<<<<<< HEAD
 int exfat_set_volume_dirty(struct super_block *sb);
 int exfat_clear_volume_dirty(struct super_block *sb);
+=======
+int exfat_set_vol_flags(struct super_block *sb, unsigned short new_flag);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 
 /* fatent.c */
 #define exfat_get_next_cluster(sb, pclu) exfat_ent_get(sb, *(pclu), pclu)
@@ -439,6 +472,10 @@ extern const struct dentry_operations exfat_utf8_dentry_ops;
 /* cache.c */
 int exfat_cache_init(void);
 void exfat_cache_shutdown(void);
+<<<<<<< HEAD
+=======
+void exfat_cache_init_inode(struct inode *inode);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 void exfat_cache_inval_inode(struct inode *inode);
 int exfat_get_cluster(struct inode *inode, unsigned int cluster,
 		unsigned int *fclus, unsigned int *dclus,
@@ -472,7 +509,11 @@ struct exfat_dentry *exfat_get_dentry_cached(struct exfat_entry_set_cache *es,
 		int num);
 struct exfat_entry_set_cache *exfat_get_dentry_set(struct super_block *sb,
 		struct exfat_chain *p_dir, int entry, unsigned int type);
+<<<<<<< HEAD
 int exfat_free_dentry_set(struct exfat_entry_set_cache *es, int sync);
+=======
+void exfat_free_dentry_set(struct exfat_entry_set_cache *es, int sync);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 int exfat_count_dir_entries(struct super_block *sb, struct exfat_chain *p_dir);
 
 /* inode.c */
@@ -535,8 +576,12 @@ void exfat_set_entry_time(struct exfat_sb_info *sbi, struct timespec64 *ts,
 		u8 *tz, __le16 *time, __le16 *date, u8 *time_cs);
 u16 exfat_calc_chksum16(void *data, int len, u16 chksum, int type);
 u32 exfat_calc_chksum32(void *data, int len, u32 chksum, int type);
+<<<<<<< HEAD
 void exfat_update_bh(struct buffer_head *bh, int sync);
 int exfat_update_bhs(struct buffer_head **bhs, int nr_bhs, int sync);
+=======
+void exfat_update_bh(struct super_block *sb, struct buffer_head *bh, int sync);
+>>>>>>> 31ff906ced3c (fs: exfat: Import exfat drivers from arter97)
 void exfat_chain_set(struct exfat_chain *ec, unsigned int dir,
 		unsigned int size, unsigned char flags);
 void exfat_chain_dup(struct exfat_chain *dup, struct exfat_chain *ec);
