@@ -1200,7 +1200,7 @@ static ssize_t
 thermal_sconfig_store(struct device *dev,
 				struct device_attribute *attr, const char *buf, size_t len)
 {
-<<<<<<< HEAD
+
        int ret, val = -1;
 
        ret = kstrtoint(buf, 10, &val);
@@ -1209,14 +1209,14 @@ thermal_sconfig_store(struct device *dev,
 
        if (ret)
                 return ret;
-=======
+
        int val = -1;
 
        val = simple_strtol(buf, NULL, 10);
 
        atomic_set(&switch_mode, val);
 
->>>>>>> f2e49bb96363 (thermal: Implement thermal config switch)
+
        return len;
 }
 
@@ -1234,7 +1234,7 @@ thermal_boost_store(struct device *dev,
 				struct device_attribute *attr, const char *buf, size_t len)
 {
        int ret;
-       ret = snprintf(boost_buf, PAGE_SIZE, buf);
+       ret = snprintf(boost_buf, sizeof(boost_buf), buf);
        return len;
 }
 
