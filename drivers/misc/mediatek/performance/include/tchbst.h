@@ -30,8 +30,13 @@
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
+<<<<<<< HEAD
 /*tchbst 100 ms*/
 #define TOUCH_TIMEOUT_NSEC 100000000
+=======
+/*tchbst 400 ms*/
+#define TOUCH_TIMEOUT_NSEC 400000000
+>>>>>>> afac3d19720d (performance: Increase touch boost period)
 #define TOUCH_BOOST_EAS 80
 #define TOUCH_BOOST_OPP 2
 #define TOUCH_FSTB_ACTIVE_US 100000
